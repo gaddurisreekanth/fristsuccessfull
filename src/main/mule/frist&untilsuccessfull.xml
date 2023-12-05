@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="016791a8-e885-476c-a8c6-898b156aaf05" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="fristsuccessfullFlow" doc:id="975ee15e-c89c-467c-8092-f6657ccab1db" >
+		<http:listener doc:name="Listener" doc:id="3e115688-0c9b-487b-b50f-50b83ebd151b" config-ref="HTTP_Listener_config" path="/first"/>
+		<first-successful doc:name="First Successful" doc:id="6706a479-2122-4f69-a2ef-6fbd7cb695f4" >
+			<route >
+				<logger level="INFO" doc:name="Logger1" doc:id="fa220e4c-c801-459f-ab84-ca4b017568d0" message='"Logger1"'/>
+				<logger level="INFO" doc:name="Logger1-1" doc:id="f45893f8-5fd7-42b2-9272-3f37ce0d67e8" message='"Logger1-1"'/>
+				<raise-error doc:name="Raise error" doc:id="17bd2dbf-7337-4af3-997e-c5da59a45ade" type="MULE : VALIDATION"/>
+				<logger level="INFO" doc:name="Logger1-2" doc:id="021afdd2-8c8b-44f0-ad04-6f80621c6c01" message='"Logger1-2"'/>
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger-2" doc:id="7b377215-ca05-4fe3-87dc-7a19d9ba2dbf" message='"Logger-2"'/>
+				<logger level="INFO" doc:name="Logger2-1" doc:id="faf30fa1-712b-4b3a-8c67-de4c5d4a644b" message='"Logger-2.1"'/>
+				<raise-error doc:name="Raise error" doc:id="b1b98914-91e0-4407-8f58-c3afc9fb9eec" type="MULE : VALIDATION"/>
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger-3" doc:id="8023cd6a-0384-4976-bc85-8a7507b49a24" message='"Logger-3"'/>
+				<raise-error doc:name="Raise error" doc:id="4a1b6e75-5443-4aca-9b3d-84fd7cf801df" type="MULE : VALIDATION" />
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger-4" doc:id="3a8979cf-cde9-4d2c-91cf-eb55ecdf3f8b" message='"Logger1-4"'/>
+			</route>
+		</first-successful>
+	</flow>
+	<flow name="fristsuccessfullFlow1" doc:id="d374f5d2-c7e4-4ef7-bcbd-008ea31b625b" >
+		<http:listener doc:name="Listener" doc:id="a597389e-e491-4605-a95d-7396b2df7954" config-ref="HTTP_Listener_config" path="/apicall"/>
+		<logger level="INFO" doc:name="Logger" doc:id="62ff9a87-1f39-45f4-be61-2194cd00e98c" message='"before excuted"'/>
+		<set-variable value="#[attributes.queryParams.id]" doc:name="Set Variable" doc:id="0726452e-f1c1-44b7-b643-839e55319fc6" variableName="id"/>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="19b98ba0-ec5b-4808-9ba1-7d0efb5c1351" millisBetweenRetries="6000">
+			<http:request method="GET" doc:name="Request" doc:id="e45fddab-6722-4ff6-abeb-e11045f0f744" url="https://dummyjson.com/products/{id}">
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"id" : vars.id
+}]]]></http:uri-params>
+		</http:request>
+			<logger level="INFO" doc:name="Logger" doc:id="1b8c4893-4075-435b-8e2e-77dce5f654ad" message='"inside the excuted"' />
+		</until-successful>
+	</flow>
+</mule>
